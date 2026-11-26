@@ -18,16 +18,21 @@ def check_length(text):
     return 1 <= len(text) <= MAX_CHARS
 
 
-def write_entry(text, output_path):
-    """Validate the roast line and write it to output_path."""
-    if not check_length(text):
-        raise ValueError("entry must be 1-160 characters, got %d" % len(text))
+def validate_single_line(text):
+    """Raise ValueError unless text is one clean line (no edges, no breaks, not blank)."""
     if text != text.strip():
         raise ValueError("entry must not have leading or trailing whitespace")
     if "\n" in text or "\r" in text:
         raise ValueError("entry must be a single line")
     if text.strip() == "":
         raise ValueError("entry must not be only whitespace")
+
+
+def write_entry(text, output_path):
+    """Validate the roast line and write it to output_path."""
+    if not check_length(text):
+        raise ValueError("entry must be 1-160 characters, got %d" % len(text))
+    validate_single_line(text)
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
     with open(output_path, "w", encoding="utf-8") as f:
         f.write(text)
